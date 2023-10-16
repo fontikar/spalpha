@@ -81,6 +81,7 @@ b_aurea <- myg_sp_enoughobs |>
 
 b_aurea |> skim()
 ```
+
 ### A quick overview of observations
 
 Make a simple map
@@ -140,6 +141,7 @@ base_map  +
   geom_sf(data = b_aurea_ahull_sf, fill = 'orange', alpha = 0.2) +
   theme_minimal()
 ```
+
 ### Extroplate across all taxa
 
 ```{r}
@@ -252,7 +254,7 @@ base_map + # There are offshore points need to crop these
 
 We need to install alphahull from the [IUCN branch](https://github.com/beatrizpateiro/alphahull/tree/WIP-ahull.IUCN-feature) to use these in code
 
-```{r}
+```{r, eval=FALSE}
 # remotes::install_github("beatrizpateiro/alphahull", ref = "WIP-ahull.IUCN-feature")
 library(alphahull)
 ```
@@ -275,6 +277,9 @@ ahull2poly(b_aurea_ahull_iucn) # Yeah I didn't think it would be that easy
 ```
 
 ### Update {hull2spatial} code
+
+Cecina's help here would be incredible. 
+
 
 ```{r}
 # hull2spatial:::ahull2lines # Prints the function
@@ -323,6 +328,8 @@ IA_ahull2lines <- function(hull)
 ```
 
 ### ConR
+
+This package depends on the the `alphahull` R package and uses the `ahull` function to create alphahulls for IUCN uses. As of recently, it has been kicked off CRAN. I have it in my libraries, but if it is the first time, you might have to install in from [source](https://github.com/gdauby/ConR) or [archive](https://cran.r-project.org/src/contrib/Archive/ConR/). Here is the [documentation](https://cran.r-hub.io/web/packages/ConR/vignettes/my-vignette.html) from 'ConR'. One (potential) shortfall is that the package implicitly adds [jitter to all points](https://github.com/gdauby/ConR/blob/504857fde96552b4930a0d73b75ae376e40e17f2/R/IUCNeval.functionv11.R#L137C25-L137C25). In my anecdotal experience, this allows creation of alpha hulls for samples where points are really close together. It would be great to avoid this using Bea's IUCN method. 
 
 #### Proof of concept for one sp 
 
