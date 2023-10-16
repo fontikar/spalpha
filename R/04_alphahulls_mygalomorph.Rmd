@@ -28,7 +28,8 @@ myg_spiders <- read_parquet(here("data/galah/Mygalomorphae_withassertions_2023-0
 
 ## Precleaning
 
-A quick clean for now, data cleaning is still being finalised
+A quick clean for now, data cleaning is still being finalised. 
+Here we are removing duplicated values and missing values in coordinate fields.
 
 ```{r}
 myg_spiders_cleaned <- myg_spiders |> 
@@ -37,6 +38,8 @@ myg_spiders_cleaned <- myg_spiders |>
 ```
 
 ## Narrow down to species with enough observations
+
+Can't create alpha hulls with fewer than 3 obs, so here we are exclude species that have fewer than 3 records.
 
 ```{r}
 # Filter down to species
