@@ -152,18 +152,18 @@ create_ahull_sf <- function(data,
                             lat, long, 
                             alpha = 2){
   
-# browser()
-ahull_obj <- data |> 
-  dplyr::select({{long}},  {{lat}}) |> 
-  alphahull::ahull(alpha = alpha)
-
-# Convert to sp then sf
-ahull_sf <- hull2spatial::ahull2poly(ahull_obj) |>
-  sf::st_as_sf() |>
-  sf::st_set_crs(4326)
-
-return(ahull_sf)
-
+  # browser()
+  ahull_obj <- data |> 
+    dplyr::select({{long}},  {{lat}}) |> 
+    alphahull::ahull(alpha = alpha)
+  
+  # Convert to sp then sf
+  ahull_sf <- hull2spatial::ahull2poly(ahull_obj) |>
+    sf::st_as_sf() |>
+    sf::st_set_crs(4326)
+  
+  return(ahull_sf)
+  
 }
 # Test this out
 create_ahull_sf(b_aurea, decimalLatitude, decimalLongitude)
@@ -190,6 +190,25 @@ myg_nested_ahull <- myg_nested_sp |>
 myg_unnested <- myg_nested_ahull |> 
   select(scientificName, points_sf, ahulls_sf) |> 
   unnest(cols = c(points_sf, ahulls_sf)) 
+# Error in unnest(select(myg_nested_ahull, scientificName, points_sf, ahulls_sf),  : 
+#   unused argument (cols = c(points_sf, ahulls_sf))
+myg_unnested <- myg_nested_ahull |> 
+  select(scientificName, points_sf, ahulls_sf) |> 
+  tidyr::unnest(cols = c(points_sf, ahulls_sf)) 
+# Error in list_unchop(col, ptype = col_ptype) : 
+#   VECTOR_ELT() can only be applied to a 'list', not a 'logical'
+# for (i in 1:nrow(myg_nested_ahull)) {
+#   print(i)
+#   myg_unnested_i <- myg_nested_ahull |> 
+#     slice(i) |>
+#     select(scientificName, points_sf, ahulls_sf) |> 
+#     tidyr::unnest(cols = c(points_sf, ahulls_sf))
+# }
+myg_unnested <- myg_nested_ahull |> 
+  select(scientificName, points_sf, ahulls_sf) |> 
+  tidyr::unnest(cols = c(points_sf)) |>
+  tidyr::unnest(cols = c(ahulls_sf))
+# drops species with null for ahulls_sf
 
 # Bind manually
 ahull_bound <- list_rbind(myg_nested_ahull$ahulls_sf) |> 
@@ -217,7 +236,7 @@ with_taxonomic_info <- myg_nested_ahull |> left_join(myg_sp_enoughobs |>
 myg_hull_plot <- with_taxonomic_info |> 
   filter(!scientificName %in% problem_taxa) |> 
   select(-occ) |>
-  unnest(c(points_sf, ahulls_sf)) 
+  tidyr::unnest(c(points_sf, ahulls_sf)) # getting an error here
 
 
 # Cropping data to mainland Australia
